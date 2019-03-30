@@ -1,0 +1,38 @@
+---
+title: "Assumption test"
+author: "Rosaline"
+date: "18 maart 2019"
+output: html_document
+---
+
+```{r}
+library(readr)
+USvideos <- read.csv("USvideos.csv")
+```
+
+```{r}
+plot(views~likes,data=USvideos)
+summary(lm(views~likes,data=USvideos))
+```
+
+```{r}
+table <- count(USvideos[1:40949,], vars = "title")
+df = USvideos[order(USvideos[,'title'],+ USvideos[,'views']),]
+df = USvideos[!duplicated(USvideos$title),]
+df$days_in_trending <- table$freq 
+df_relevant_data <- data.frame(df$title, df$days_in_trending, df$views, df$likes, df$dislikes, df$comment_count)
+```
+
+```{r}
+plot(df.views~df.likes,data=df_relevant_data)
+summary(lm(df.views~df.likes,data=df_relevant_data))
+
+plot(df.views~df.dislikes,data=df_relevant_data)
+summary(lm(df.views~df.dislikes,data=df_relevant_data))
+
+plot(df.views~df.comment_count,data=df_relevant_data)
+summary(lm(df.views~df.comment_count,data=df_relevant_data))
+
+
+```
+

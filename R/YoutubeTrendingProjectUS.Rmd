@@ -1,0 +1,79 @@
+---
+title: "YouTubeTrendingProject"
+author: "Rosaline"
+date: "14 maart 2019"
+output: pdf_document
+---
+
+```{r}
+#Code for reading the csv file and creating a dataframe of the data. 
+library(readr)
+USvideos <- read.csv("USvideos.csv")
+```
+
+
+```{r}
+#Code for counting the amount of times each individual title occurs. 
+table <- count(USvideos[1:40949,], vars = "title")
+```
+
+
+```{r}
+#This is the code for creating a dataframe with only the relevant data in it. All the duplicates are removed and a variable called days_in_trending is added to represent the amount of days a video stayed in the trending section.  
+df = USvideos[order(USvideos[,'title'],+ USvideos[,'views']),]
+df = USvideos[!duplicated(USvideos$title),]
+df$days_in_trending <- table$freq 
+df_relevant_data <- data.frame(df$days_in_trending, df$views, df$likes, df$dislikes, df$comment_count)
+```
+
+```{r}
+#Code for the execution of the linear regression. 
+summary(lm(df.days_in_trending~df.views+df.likes+df.dislikes+df.comment_count, data = df_relevant_data))
+pairs(df_relevant_data)
+```
+
+```{r}
+#Code for spearman rank correlation 
+attach(df_relevant_data)
+
+plot(df.days_in_trending, df.views)
+cor.test(df.days_in_trending, df.views)
+
+plot(df.days_in_trending, df.likes)
+cor.test(df.days_in_trending, df.likes)
+
+plot(df.days_in_trending, df.dislikes)
+cor.test(df.days_in_trending, df.dislikes)
+
+plot(df.days_in_trending, df.comment_count)
+cor.test(df.days_in_trending, df.comment_count)
+```
+
+
+```{r}
+#Code for the log transformation to make the data look more normally distributed. 
+df_relevant_data_log <- log10(df_relevant_data)
+attach(df_relevant_data_log)
+qqnorm(df.days_in_trending)
+cor(df_relevant_data)
+summary(glm(df.days_in_trending~df.views+df.likes+df.dislikes+df.comment_count, data = df_relevant_data))
+```
+
+```{r}
+#COde in which the 1 value is removed to make the data look more normally distributed. And this data is then also log transformated. 
+df_relevant_data_min1value <- df_relevant_data[!(df_relevant_data$df.days_in_trending=="1"),]
+attach(df_relevant_data_min1value)
+qqnorm(df.days_in_trending)
+df_relevant_data_min1valuelog <- log10(df_relevant_data_min1value)
+attach(df_relevant_data_min1valuelog)
+qqnorm(df.days_in_trending)
+
+```
+
+```{r}
+#Execution of the linear regression on the data in which the videos that only stayed in the trending section for 1 day are removed and the data is log transformated. 
+attach(df_relevant_data_min1valuelog) 
+summary(lm(df.days_in_trending~df.views+df.likes+df.dislikes+df.comment_count, data = df_relevant_data_min1value))
+```
+
+

@@ -1,0 +1,54 @@
+---
+title: "YouTubeTrendingProject"
+author: "Rosaline"
+date: "14 maart 2019"
+output: pdf_document
+---
+
+```{r}
+#Code for reading the csv file and creating a dataframe of the data. 
+library(readr)
+USvideos <- read.csv("CAvideos.csv")
+```
+
+
+```{r}
+#Code for counting the amount of times each individual title occurs. 
+table <- count(USvideos[1:40881,], vars = "title")
+```
+
+
+```{r}
+#This is the code for creating a dataframe with only the relevant data in it. All the duplicates are removed and a variable called days_in_trending is added to represent the amount of days a video stayed in the trending section.  
+df = USvideos[order(USvideos[,'title'],+ USvideos[,'views']),]
+df = USvideos[!duplicated(USvideos$title),]
+df$days_in_trending <- table$freq 
+df_relevant_data <- data.frame(df$days_in_trending, df$views, df$likes, df$dislikes, df$comment_count)
+```
+
+```{r}
+#Code for the execution of the linear regression. 
+summary(glm(df.days_in_trending~df.views+df.likes+df.dislikes+df.comment_count, family=poisson,data = df_relevant_data))
+pairs(df_relevant_data)
+```
+
+```{r}
+#Code for spearman rank correlation 
+attach(df_relevant_data)
+
+plot(df.days_in_trending, df.views)
+cor.test(df.days_in_trending, df.views)
+
+plot(df.days_in_trending, df.likes)
+cor.test(df.days_in_trending, df.likes)
+
+plot(df.days_in_trending, df.dislikes)
+cor.test(df.days_in_trending, df.dislikes)
+
+plot(df.days_in_trending, df.comment_count)
+cor.test(df.days_in_trending, df.comment_count)
+```
+
+
+
+
